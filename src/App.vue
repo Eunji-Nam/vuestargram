@@ -5,12 +5,23 @@
     </ul>
 
     <ul class="header-button-right">
+      <li v-if="step === 0" @click="step = 3">팔로워</li>
       <li v-if="step === 1" @click="step++">Next</li>
       <li v-if="step === 2" @click="publish">발행</li>
+      <li v-if="step === 3" @click="step = 0">HOME</li>
     </ul>
 
     <img src="./assets/logo.png" class="logo" />
   </div>
+
+  <!-- <h4>안녕 {{ name }}  {{ likes }}  {{ 내이름 }}</h4>
+  <button @click="$store.commit('이름변경')">버튼</button>
+
+  <h4>{{ age }}</h4>
+  <button @click="plus()">+</button>
+
+  <p>{{ $store.state.more }}</p>
+  <button @click="$store.dispatch('getData')">더보기버튼</button> -->
 
   <Container :인스타데이터='인스타데이터' :step='step' :이미지='이미지' @write='msg = $event'/>
 
@@ -35,6 +46,7 @@
 import data from './assets/data'
 import Container from './components/Container.vue';
 import axios from 'axios'
+import {mapMutations, mapState} from 'vuex'
 
 axios.post()
 
@@ -53,10 +65,22 @@ export default {
       step: 0,
       이미지: '',
       msg: '',
+      filter: ''
     }
   },
 
+  computed: {
+    // name() {
+    //   return this.$store.state.name
+    // },
+    ...mapState(['name', 'age', 'likes']),
+    ...mapState({ 내이름: 'name' })
+  },
+
   methods: {
+    ...mapMutations(['setMore', 'like', 'plus']), 
+
+
     upload(e) {
       let 파일 = e.target.files
       console.log(파일[0])
@@ -102,12 +126,19 @@ export default {
         date: "May 15",
         liked: false,
         content: this.msg,
-        filter: "perpetua"
+        filter: this.filter
       }
       this.인스타데이터.unshift(게시물)
       this.step = 0
       console.log(this.msg)
     }
+  },
+
+  mounted() {
+    this.emitter.on('setFilter', (a) => {
+      this.filter = a
+      console.log(a)
+    })
   }
 }
 </script>
